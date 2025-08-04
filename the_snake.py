@@ -43,22 +43,21 @@ class GameObject:
 class Apple(GameObject):
     """Класс для яблока"""
 
-    def __init__(self):
+    def __init__(self, snake=None):
         super().__init__(body_color=APPLE_COLOR)
-        self.randomize_position()
+        self.randomize_position(snake)
 
     def randomize_position(self, snake=None):
         """Случайное размещение яблока на поле"""
+        occupied_positions = snake.positions if snake else []
         while True:
             x = random.randint(0, GRID_WIDTH - 1) * GRID_SIZE
             y = random.randint(0, GRID_HEIGHT - 1) * GRID_SIZE
             position = (x, y)
 
-            # Проверяем, чтобы яблоко не появилось на змейке
-            if snake and position in snake.positions:
-                continue
-            self.position = position
-            return
+            if position not in occupied_positions:
+                self.position = position
+                return
 
 
 class Snake(GameObject):
@@ -91,7 +90,7 @@ class Snake(GameObject):
 
     def move(self):
         """Движение змейки"""
-        head_x, head_y = self.positions[0]
+        head_x, head_y = self.get_head_position()
         dir_x, dir_y = self.direction
         new_x = (head_x + dir_x * GRID_SIZE) % SCREEN_WIDTH
         new_y = (head_y + dir_y * GRID_SIZE) % SCREEN_HEIGHT
@@ -138,8 +137,8 @@ def handle_keys(snake):
 
 def main():
     """Основная игровая функция"""
-    apple = Apple()
     snake = Snake()
+    apple = Apple(snake)
     running = True
 
     while running:
@@ -158,7 +157,7 @@ def main():
             apple.randomize_position(snake)
 
         # Проверка столкновения с собой
-        if snake.check_collision():
+        elif snake.check_collision():
             snake.reset()
 
         # Отрисовка
