@@ -43,13 +43,13 @@ class GameObject:
 class Apple(GameObject):
     """Класс для яблока"""
 
-    def __init__(self, snake=None):
+    def __init__(self, occupied_positions=None):
         super().__init__(body_color=APPLE_COLOR)
-        self.randomize_position(snake)
+        self.randomize_position(occupied_positions)
 
-    def randomize_position(self, snake=None):
+    def randomize_position(self, occupied_positions=None):
         """Случайное размещение яблока на поле"""
-        occupied_positions = snake.positions if snake else []
+        occupied_positions = occupied_positions if occupied_positions else []
         while True:
             x = random.randint(0, GRID_WIDTH - 1) * GRID_SIZE
             y = random.randint(0, GRID_HEIGHT - 1) * GRID_SIZE
@@ -138,7 +138,7 @@ def handle_keys(snake):
 def main():
     """Основная игровая функция"""
     snake = Snake()
-    apple = Apple(snake)
+    apple = Apple(snake.positions)
     running = True
 
     while running:
@@ -154,7 +154,7 @@ def main():
         # Проверка столкновения с яблоком
         if snake.positions[0] == apple.position:
             snake.grow_to += 1
-            apple.randomize_position(snake)
+            apple.randomize_position(snake.positions)
 
         # Проверка столкновения с собой
         elif snake.check_collision():
